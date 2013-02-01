@@ -1,0 +1,9 @@
+appkey:
+userkey:
+eventkey:
+tempfile:/tmp/satt
+temprespfile:/tmp/resp
+outputpath:
+fridaysched:
+saturdaysched:
+header:
