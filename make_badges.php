@@ -4,11 +4,13 @@ include "EB/Eventbrite.php";
 include "functions.php";
 include_once('phpqrcode/qrlib.php');
 
+//Read in configurable data
 $appdata = getAuthData('/etc/ebkeys');
 
 global $badge_width;
 global $badge_height;
 
+//Same width as the header and schedule images
 $badge_width = 800;
 $badge_height = $badge_width * sqrt(2); //Correct dimensions for A5
 
@@ -69,6 +71,7 @@ $fnl = 0;
 $lnl = 0;
 $rol = 0;
 $col = 0;
+
 foreach($attendee_info as $id => $list) {
     if(strlen($list["first_name"]) > $fnl) {
         $fnl = strlen($list["first_name"]);
@@ -98,6 +101,7 @@ echo "Longest company name $col on badge id $coid\n";
 
 //Create all barcode files
 //The size of these needs to be relative to the badge size but still an integer. 8 is right for 800 width.
+
 $size = floor($badge_width / 100);
 
 foreach($attendee_info as $id => $list) {
