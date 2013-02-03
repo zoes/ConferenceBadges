@@ -22,10 +22,11 @@ function make_badge_template($att_type, $days, $outpath, $friday_schedule, $satu
     $spkr = html2rgb("#DA6125");
     $exhi = html2rgb("#808080");
     $spon = html2rgb("#25BCDA");
-    /*
+    
     $volu = html2rgb("#9D24DA"); //Purple
     $keyn = html2rgb("#0E4B57"); //Darker blue
     $dire = html2rgb("#24DA9D"); //Dark aqua
+    /*
     $spar = html2rgb("#561A0E"); // Dark red (probably too dark for black text)
     */
 
@@ -57,6 +58,9 @@ function make_badge_template($att_type, $days, $outpath, $friday_schedule, $satu
     imagecolorallocate($image, $spkr[0], $spkr[1], $spkr[2]);
     imagecolorallocate($image, $exhi[0], $exhi[1], $exhi[2]);
     imagecolorallocate($image, $spon[0], $spon[1], $spon[2]);
+    imagecolorallocate($image, $volu[0], $volu[1], $volu[2]);
+    imagecolorallocate($image, $keyn[0], $keyn[1], $keyn[2]);
+    imagecolorallocate($image, $dire[0], $dire[1], $dire[2]);
 
 
      
@@ -99,6 +103,15 @@ function make_badge_template($att_type, $days, $outpath, $friday_schedule, $satu
          
     } else if ($att_type == "SPONSOR") {
         $spon_d = imagecolorallocate($del, $spon[0], $spon[1], $spon[2]);
+        
+    } else if ($att_type == "VOLUNTEER") {
+        $spon_d = imagecolorallocate($del, $volu[0], $volu[1], $volu[2]);
+        
+    } else if ($att_type == "DIRECTOR") {
+        $spon_d = imagecolorallocate($del, $dire[0], $dire[1], $dire[2]);
+
+    } else if ($att_type == "KEYNOTE") {
+        $spon_d = imagecolorallocate($del, $keyn[0], $keyn[1], $keyn[2]);      
 
     } else {
         echo "WARNING - UNKNOWN ATTENDEE TYPE \n";
@@ -290,6 +303,9 @@ function get_ticket_categories($ticket_types) {
             if(preg_match("/onsor/", $ticket->ticket->name)) {
                 $tickets[$ticket->ticket->id] = array("delegate_type" => "SPONSOR", "days" => "TWO");
 
+            } else if (preg_match("/unteer/", $ticket->ticket->name)) {
+                $tickets[$ticket->ticket->id] = array("delegate_type" => "VOLUNTEER", "days" => "TWO");
+                        
             } else {
                 $tickets[$ticket->ticket->id] = array("delegate_type" => "DELEGATE", "days" =>"TWO");
             }
@@ -297,6 +313,9 @@ function get_ticket_categories($ticket_types) {
         } else if (preg_match("/riday/", $ticket->ticket->name)) {
             if(preg_match("/onsor/", $ticket->ticket->name)) {
                 $tickets[$ticket->ticket->id] = array("delegate_type" => "SPONSOR","days" =>"FRIDAY");
+                
+            } else if (preg_match("/unteer/", $ticket->ticket->name)) {
+                $tickets[$ticket->ticket->id] = array("delegate_type" => "VOLUNTEER", "days" => "FRIDAY");
             } else {
                 $tickets[$ticket->ticket->id] = array("delegate_type" => "DELEGATE", "days" =>"FRIDAY");
             }
@@ -304,6 +323,9 @@ function get_ticket_categories($ticket_types) {
         } else if (preg_match("/aturday/", $ticket->ticket->name)) {
             if(preg_match("/onsor/", $ticket->ticket->name)) {
                 $tickets[$ticket->ticket->id] = array("delegate_type" => "SPONSOR", "days" =>"SATURDAY");
+                 
+            } else if (preg_match("/unteer/", $ticket->ticket->name)) {
+                $tickets[$ticket->ticket->id] = array("delegate_type" => "VOLUNTEER", "days" => "SATURDAY");
             } else {
                 $tickets[$ticket->ticket->id] = array("delegate_type" => "DELEGATE", "days" =>"SATURDAY");
             }
