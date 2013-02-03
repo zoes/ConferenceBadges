@@ -37,6 +37,7 @@ if(file_exists($appdata['temprespfle'])) {
 
 //Divide the ticket types by day and attendee type
 $tickets = get_ticket_categories($resp->event->tickets);
+var_dump($tickets);
 
 
 foreach ($tickets as $id => $list) {

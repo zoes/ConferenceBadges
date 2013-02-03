@@ -17,9 +17,17 @@ function make_badge_template($att_type, $days, $outpath, $friday_schedule, $satu
     $red = html2rgb("#DA25BC");
     $rblue = html2rgb("#2561DA");
     $green = html2rgb("#25DA43");
+    
+    // Delegates are gold
     $spkr = html2rgb("#DA6125");
     $exhi = html2rgb("#808080");
     $spon = html2rgb("#25BCDA");
+    /*
+    $volu = html2rgb("#9D24DA"); //Purple
+    $keyn = html2rgb("#0E4B57"); //Darker blue
+    $dire = html2rgb("#24DA9D"); //Dark aqua
+    $spar = html2rgb("#561A0E"); // Dark red (probably too dark for black text)
+    */
 
     //Use a very standard font - niche ones do not have good enough support for accents (eg caron).
     $font_path = 'arial';
@@ -278,7 +286,7 @@ function get_ticket_categories($ticket_types) {
 
     foreach( $ticket_types as $ticket) {
 
-        if(preg_match("/wo day/", $ticket->ticket->name)) {
+        if (preg_match("/wo day/", $ticket->ticket->name) && (!preg_match("/xhibit/", $ticket->ticket->name))  ){
             if(preg_match("/onsor/", $ticket->ticket->name)) {
                 $tickets[$ticket->ticket->id] = array("delegate_type" => "SPONSOR", "days" => "TWO");
 
