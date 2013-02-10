@@ -11,8 +11,8 @@ global $badge_width;
 global $badge_height;
 
 //Same width as the header and schedule images
-$badge_width = 800;
-$badge_height = $badge_width * sqrt(2); //Correct dimensions for A5
+$badge_width = 1116;
+$badge_height = 1624;
 
 //Check the the output directory exists and quit if not
 if(!is_dir($appdata["outputpath"])) {
@@ -28,8 +28,8 @@ $authentication_tokens = array('app_key'  => $appdata['appkey'],
 $eb_client = new Eventbrite( $authentication_tokens );
 
 //Get the ticket types, use a local cached copy if there is one
-if(file_exists($appdata['temprespfle'])) {
-    $resp = unserialize(file_get_contents($appdata['temprespfle']));
+if(file_exists($appdata['temprespfile'])) {
+    $resp = unserialize(file_get_contents($appdata['temprespfile']));
 }else {
     $resp = $eb_client->event_get( array('id'=>$appdata['eventkey'])  );
     $s_resp = serialize($resp);
@@ -62,7 +62,7 @@ $attendee_info = attendee_list_get_info($attendees);
 
 $summary="";
 foreach($attendee_info as $id => $list) {
-    $summary .=  "ID: " .$id. ", " .$list["first_name"]. ", " . $list["last_name"]. ", " . $tickets[$id]. ", " . $list["barcode"]. "\n";
+    $summary .=  "ID: " .$id. ", " .$list["first_name"]. ", " . $list["last_name"]. ", " . $tickets[$id]. ", " . $list["barcode"]. ", " .$tickets[$list["ticket_type"]]. "\n";
 }
 file_put_contents($appdata["outputpath"]."/summary.txt", $summary);
 
@@ -76,25 +76,29 @@ foreach($attendee_info as $id => $list) {
     if(strlen($list["first_name"]) > $fnl) {
         $fnl = strlen($list["first_name"]);
         $fnid = $id;
+        $fn = $list["first_name"];
     }
     if(strlen($list["last_name"]) > $lnl) {
         $lnl = strlen($list["last_name"]);
         $lnid = $id;
+        $ln = $list["last_name"];
     }
     if(strlen($list["job_title"]) > $rol) {
         $rol = strlen($list["job_title"]);
         $roid = $id;
+        $ro = $list["job_title"];
     }
     if(strlen($list["company"]) > $col) {
         $col = strlen($list["company"]);
         $coid = $id;
+        $co = $list["company"];
     }
 
 }
-echo "Longest first name $fnl on badge id $fnid\n";
-echo "Longest last name $lnl on badge id $lnid\n";
-echo "Longest role  name $rol on badge id $roid\n";
-echo "Longest company name $col on badge id $coid\n";
+echo "Longest first name $fn ($fnl) on badge id $fnid\n";
+echo "Longest last name $ln ($lnl) on badge id $lnid\n";
+echo "Longest role  name $ro ($rol) on badge id $roid\n";
+echo "Longest company name $co ($col) on badge id $coid\n";
 
 
 //Print names and QR codes on badges
@@ -103,70 +107,104 @@ echo "Longest company name $col on badge id $coid\n";
 //The size of these needs to be relative to the badge size but still an integer. 8 is right for 800 width.
 
 $size = floor($badge_width / 100);
-
+echo "Total attendees ". count($attendee_info) . "\n";
 foreach($attendee_info as $id => $list) {
+    
     //Long first name
+    
     if($id=="172053468"){
         $filename = $appdata["outputpath"]. "/qrcodes/".$id.".png";
-        QRcode::png($list["barcode"], $filename, "L", 8, 2);
+        QRcode::png($list["barcode"], $filename, "L", $size, 2);
     }
     //Long last name
     if($id=="172807032"){
         $filename = $appdata["outputpath"]. "/qrcodes/".$id.".png";
-        QRcode::png($list["barcode"], $filename, "L", 8, 2);
+        QRcode::png($list["barcode"], $filename, "L", $size, 2);
     }
     //Long role name
-    if($id=="170810956"){
+    if($id=="178200170"){
         $filename = $appdata["outputpath"]. "/qrcodes/".$id.".png";
-        QRcode::png($list["barcode"], $filename, "L", 8, 2);
+        QRcode::png($list["barcode"], $filename, "L", $size, 2);
     }
     //long company name
     if($id=="152807137"){
         $filename = $appdata["outputpath"]. "/qrcodes/".$id.".png";
-        QRcode::png($list["barcode"], $filename, "L", 8, 2);
+        QRcode::png($list["barcode"], $filename, "L", $size, 2);
     }
 
     if($id=="166728340"){
         $filename = $appdata["outputpath"]. "/qrcodes/".$id.".png";
-        QRcode::png($list["barcode"], $filename, "L", 8, 2);
+        QRcode::png($list["barcode"], $filename, "L", $size, 2);
     }
     if($id=="168433690"){
         $filename = $appdata["outputpath"]. "/qrcodes/".$id.".png";
-        QRcode::png($list["barcode"], $filename, "L", 8, 2);
+        QRcode::png($list["barcode"], $filename, "L", $size, 2);
     }
+    /*
+     $filename = $appdata["outputpath"]. "/qrcodes/".$id.".png";
+     QRcode::png($list["barcode"], $filename, "L", $size, 2);
+     */
 }
+//Count badges of each type
 
+foreach($tickets as $tt => $tn) {
+    $name = $tn["days"] . "_" . $tn["delegate_type"];
+    $badge_count[$name] = 0;
+    $dels[$name]= array();
+}
 foreach($attendee_info as $id => $list) {
-    //For testing - just make two badges
+    //For testing - just make sample badges
+   
     if($id=="166728340"){
         $filename = $appdata["outputpath"]. "/qrcodes/".$id.".png";
-        make_badge($list["first_name"], $list["last_name"], $list["company"], $list["job_title"], $filename, $appdata["header"], $tickets[$list["ticket_type"]], $appdata["outputpath"], 60);
+        make_badge($list["first_name"], $list["last_name"], $list["company"], $list["job_title"], 
+        $filename, $appdata["header"], $tickets[$list["ticket_type"]], $appdata["outputpath"], $appdata["border-left"], $appdata["border-top"] );
     }
     if($id=="168433690"){
         $filename = $appdata["outputpath"]. "/qrcodes/".$id.".png";
-        make_badge($list["first_name"], $list["last_name"], $list["company"], $list["job_title"], $filename, $appdata["header"], $tickets[$list["ticket_type"]], $appdata["outputpath"], 60);
+        make_badge($list["first_name"], $list["last_name"], $list["company"], $list["job_title"], 
+        $filename, $appdata["header"], $tickets[$list["ticket_type"]], $appdata["outputpath"], $appdata["border-left"], $appdata["border-top"]);
     }
     //Long first name
     if($id=="172053468"){
         $filename = $appdata["outputpath"]. "/qrcodes/".$id.".png";
-        make_badge($list["first_name"], $list["last_name"], $list["company"], $list["job_title"], $filename, $appdata["header"], $tickets[$list["ticket_type"]], $appdata["outputpath"], 60);
+        make_badge($list["first_name"], $list["last_name"], $list["company"], $list["job_title"], 
+        $filename, $appdata["header"], $tickets[$list["ticket_type"]], $appdata["outputpath"], $appdata["border-left"], $appdata["border-top"]);
     }
     //Long last name
     if($id=="172807032"){
         $filename = $appdata["outputpath"]. "/qrcodes/".$id.".png";
-        make_badge($list["first_name"], $list["last_name"], $list["company"], $list["job_title"], $filename, $appdata["header"], $tickets[$list["ticket_type"]], $appdata["outputpath"], 60);
+        make_badge($list["first_name"], $list["last_name"], $list["company"], $list["job_title"], 
+        $filename, $appdata["header"], $tickets[$list["ticket_type"]], $appdata["outputpath"], $appdata["border-left"], $appdata["border-top"]);
     }
     //Long role name
-    if($id=="170810956"){
+    if($id=="178200170"){
         $filename = $appdata["outputpath"]. "/qrcodes/".$id.".png";
-        make_badge($list["first_name"], $list["last_name"], $list["company"], $list["job_title"], $filename, $appdata["header"], $tickets[$list["ticket_type"]], $appdata["outputpath"], 60);
+        make_badge($list["first_name"], $list["last_name"], $list["company"], $list["job_title"], 
+        $filename, $appdata["header"], $tickets[$list["ticket_type"]], $appdata["outputpath"], $appdata["border-left"], $appdata["border-top"]);
     }
     //long company name
     if($id=="152807137"){
         $filename = $appdata["outputpath"]. "/qrcodes/".$id.".png";
-        make_badge($list["first_name"], $list["last_name"], $list["company"], $list["job_title"], $filename, $appdata["header"], $tickets[$list["ticket_type"]], $appdata["outputpath"], 60);
+        make_badge($list["first_name"], $list["last_name"], $list["company"], $list["job_title"], 
+        $filename, $appdata["header"], $tickets[$list["ticket_type"]], $appdata["outputpath"], $appdata["border-left"], $appdata["border-top"]);
     }
+    /*
+    $filename = $appdata["outputpath"]. "/qrcodes/".$id.".png";
+    $tt = $tickets[$list["ticket_type"]];
+    make_badge($list["first_name"], $list["last_name"], $list["company"], $list["job_title"], 
+    $filename, $appdata["header"], $tt, $appdata["outputpath"], $appdata["border-left"], $appdata["border-top"]);
+    
+    $name = $tt["days"] . "_" . $tt["delegate_type"];
+    $badge_count[$name]++;
+    $fname = $list["first_name"] . "_" . $list["last_name"];
+    array_push($dels[$name], $fname);
+    */
 }
+
+//Debug! var_dump($badge_count);
+
+//Debug! print_r(array_count_values($dels["TWO_DELEGATE"]));
 
 
 ?>
